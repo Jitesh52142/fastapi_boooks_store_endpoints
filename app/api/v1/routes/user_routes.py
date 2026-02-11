@@ -3,6 +3,10 @@ from app.schemas.user_schema import UserRegister, UserLogin
 from app.db.mongodb import db
 from app.core.security import hash_password, verify_password, create_access_token
 from bson import ObjectId
+from fastapi import Depends
+from app.core.security import get_current_user
+from app.core.exceptions import NotFoundException
+
 
 router = APIRouter(prefix="/api/v1/users", tags=["User Management"])
 
@@ -34,3 +38,24 @@ async def login(user: UserLogin):
 
     token = create_access_token({"sub": str(db_user["_id"])})
     return {"access_token": token, "token_type": "bearer"}
+
+
+
+
+@router.get("/profile")
+async def get_profile(user=Depends(get_current_user)):
+    return {
+        "id": str(user["_id"]),
+        "name": user["name"],
+        "email": user["email"],
+        "role": user["role"]
+    }
+
+
+@router.put("/profile")
+async def update_profile(name: str, user=Depends(get_current_user)):
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"name": name}}
+    )
+    return {"message": "Profile updated successfully"}
