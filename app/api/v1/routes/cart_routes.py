@@ -18,3 +18,27 @@ async def add_to_cart(book_id: str, quantity: int, user=Depends(get_current_user
     )
 
     return {"message": "Book added to cart"}
+
+
+
+@router.get("/")
+async def view_cart(user=Depends(get_current_user)):
+    return {"cart": user.get("cart", [])}
+
+
+@router.put("/update/{book_id}")
+async def update_cart(book_id: str, quantity: int, user=Depends(get_current_user)):
+    await db.users.update_one(
+        {"_id": user["_id"], "cart.book_id": book_id},
+        {"$set": {"cart.$.quantity": quantity}}
+    )
+    return {"message": "Cart updated successfully"}
+
+
+@router.delete("/remove/{book_id}")
+async def remove_from_cart(book_id: str, user=Depends(get_current_user)):
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {"$pull": {"cart": {"book_id": book_id}}}
+    )
+    return {"message": "Book removed from cart"}
