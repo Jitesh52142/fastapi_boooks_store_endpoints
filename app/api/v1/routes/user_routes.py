@@ -18,7 +18,8 @@ async def register(user: UserRegister):
         raise HTTPException(400, "Email already registered")
 
     user_dict = user.dict()
-    user_dict["password"] = hash_password(user.password)
+    user_dict["password"] = user.password
+
     user_dict["role"] = "user"
     user_dict["cart"] = []
 
