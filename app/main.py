@@ -18,9 +18,6 @@ app.include_router(order_routes.router)
 app.include_router(review_routes.router)
 
 
-@app.on_event("startup")
-async def startup_db_client():
-    await db.command("ping")
 
 
 
@@ -78,3 +75,5 @@ async def global_exception_handler(request: Request, exc: Exception):
             "error": "Internal Server Error"
         }
     )
+
+
