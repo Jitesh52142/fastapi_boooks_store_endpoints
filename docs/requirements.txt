@@ -1,0 +1,6 @@
+fastapi
+motor
+pymongo
+python-jose
+passlib[bcrypt]
+pydantic[email]
